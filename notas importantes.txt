@@ -1,3 +1,12 @@
 https://wiki.sicredi.io/display/HDEDS/Golden+Paths
 
 https://teams.sicredi.io/secure/Dashboard.jspa
+
+
+https://wiki.sicredi.io/display/HDEDS/Back-end+Golden+Path
+https://teams.sicredi.io/secure/RapidBoard.jspa?rapidView=7496&projectKey=PC#
+https://wiki.sicredi.io/#all-updates
+https://teams.sicredi.io/secure/Dashboard.jspa
+https://acessos.sicredi.net/home.jsf
+https://gitlab.sicredi.net/dashboard/projects
+https://gitlab.sicredi.net/spi
