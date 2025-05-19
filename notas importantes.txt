@@ -22,4 +22,4 @@ https://gitlab.sicredi.net/spicanais/spicanais-protocolo-api.git
 https://wiki.sicredi.io/pages/viewpage.action?pageId=297439428
 
 
-alterando !!!
+alterando !!! opa!
