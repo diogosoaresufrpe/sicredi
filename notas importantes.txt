@@ -14,3 +14,6 @@ tre5r
 primeira demanda 
 
 https://teams.sicredi.io/browse/PC-931
+
+
+https://gitlab.sicredi.net/spicanais/spicanais-protocolo-api.git
