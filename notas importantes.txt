@@ -19,5 +19,6 @@ https://gitlab.sicredi.net/spicanais/spicanais-protocolo-api.git
 
 https://wiki.sicredi.io/pages/viewpage.action?pageId=297439428
 
+https://wiki.sicredi.io/pages/viewpage.action?pageId=357662756
 
 
