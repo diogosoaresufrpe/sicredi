@@ -17,3 +17,6 @@ https://teams.sicredi.io/browse/PC-931
 
 
 https://gitlab.sicredi.net/spicanais/spicanais-protocolo-api.git
+
+
+https://wiki.sicredi.io/pages/viewpage.action?pageId=297439428
