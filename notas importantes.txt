@@ -60,3 +60,5 @@ http://localhost:8095/swagger-ui/index.html#/
 segunda demanda
 21-05-2025
 https://teams.sicredi.io/browse/PC-1039
+
+https://gitlab.sicredi.net/spirecorrencia/spirecorrencia-api
