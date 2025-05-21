@@ -56,3 +56,7 @@ http://localhost:8095/swagger-ui/index.html#/
   "cpfCnpjAssociado": "55307361815",
   "prioridadePagamento": "NORMAL"
 }
+
+segunda demanda
+21-05-2025
+https://teams.sicredi.io/browse/PC-1039
