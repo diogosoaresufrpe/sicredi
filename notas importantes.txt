@@ -68,3 +68,23 @@ https://gitlab.sicredi.net/spirecorrencia/spirecorrencia-api
         modified:   src/main/java/io/sicredi/spirecorrencia/api/automatico/instrucaopagamentocancelamento/RecorrenciaInstrucaoPagamentoCancelamentoRepository.java
         modified:   src/main/java/io/sicredi/spirecorrencia/api/repositorio/RecorrenciaTransacaoRepository.java
 
+@Autowired
+private SeuRepositorio repositorio;
+ 
+public void processarTodosOsDados() {
+    int pagina = 0;
+    int tamanho = 20; // tamanho da página
+    Page paginaAtual;
+ 
+    do {
+        Pageable pageable = PageRequest.of(pagina, tamanho);
+        paginaAtual = repositorio.findByAlgumFiltro(pageable); // ou findAll(pageable)
+ 
+        for (Entidade entidade : paginaAtual.getContent()) {
+            // Processa cada entidade
+            System.out.println(entidade);
+        }
+ 
+        pagina++;
+    } while (paginaAtual.hasNext());
+}
