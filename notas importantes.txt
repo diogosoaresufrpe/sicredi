@@ -62,3 +62,9 @@ segunda demanda
 https://teams.sicredi.io/browse/PC-1039
 
 https://gitlab.sicredi.net/spirecorrencia/spirecorrencia-api
+
+ (use "git restore <file>..." to discard changes in working directory)
+        modified:   src/main/java/io/sicredi/spirecorrencia/api/automatico/instrucaopagamento/RecorrenciaInstrucaoPagamentoRepository.java
+        modified:   src/main/java/io/sicredi/spirecorrencia/api/automatico/instrucaopagamentocancelamento/RecorrenciaInstrucaoPagamentoCancelamentoRepository.java
+        modified:   src/main/java/io/sicredi/spirecorrencia/api/repositorio/RecorrenciaTransacaoRepository.java
+
