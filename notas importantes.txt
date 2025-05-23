@@ -2,6 +2,16 @@ https://wiki.sicedi.io/display/HDEDS/Golden+Paths
 
 https://teams.sicredi.io/secure/Dashboard.jspa
 
+
+
+https://wiki.sicredi.io/display/HDEDS/Back-end+Golden+Path
+https://teams.sicredi.io/secure/RapidBoard.jspa?rapidView=7496&projectKey=PC#
+https://wiki.sicredi.io/#all-updates
+https://teams.sicredi.io/secure/Dashboard.jspa
+https://acessos.sicredi.net/home.jsf
+https://gitlab.sicredi.net/dashboard/projects
+https://gitlab.sicredi.net/spi
+
 https://github.com/diogosoaresufrpe/sicredi/blob/main/notas%20importantes.txt
 
 
@@ -63,28 +73,6 @@ https://teams.sicredi.io/browse/PC-1039
 
 https://gitlab.sicredi.net/spirecorrencia/spirecorrencia-api
 
- (use "git restore <file>..." to discard changes in working directory)
-        modified:   src/main/java/io/sicredi/spirecorrencia/api/automatico/instrucaopagamento/RecorrenciaInstrucaoPagamentoRepository.java
-        modified:   src/main/java/io/sicredi/spirecorrencia/api/automatico/instrucaopagamentocancelamento/RecorrenciaInstrucaoPagamentoCancelamentoRepository.java
-        modified:   src/main/java/io/sicredi/spirecorrencia/api/repositorio/RecorrenciaTransacaoRepository.java
 
-@Autowired
-private SeuRepositorio repositorio;
- 
-public void processarTodosOsDados() {
-    int pagina = 0;
-    int tamanho = 20; // tamanho da página
-    Page paginaAtual;
- 
-    do {
-        Pageable pageable = PageRequest.of(pagina, tamanho);
-        paginaAtual = repositorio.findByAlgumFiltro(pageable); // ou findAll(pageable)
- 
-        for (Entidade entidade : paginaAtual.getContent()) {
-            // Processa cada entidade
-            System.out.println(entidade);
-        }
- 
-        pagina++;
-    } while (paginaAtual.hasNext());
-}
+
+
