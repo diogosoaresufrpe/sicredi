@@ -69,4 +69,4 @@ https://gitlab.sicredi.net/spirecorrencia/spirecorrencia-api
         modified:   src/main/java/io/sicredi/spirecorrencia/api/repositorio/RecorrenciaTransacaoRepository.java
 
 
-}
+Caused by: org.hibernate.query.QueryArgumentException: Argument [EXCLUIDO] of type [java.lang.String] did not match parameter type [br.com.sicredi.spicanais.transacional.transport.lib.commons.enums.TipoStatusEnum (n/a)]
