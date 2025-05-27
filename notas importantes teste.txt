@@ -80,3 +80,57 @@ class ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest {
         assertEquals(conteudoPagina2, chamadas.get(1));
     }
 }
+
+
+
+-----------------------------------------------------------------
+
+> Task :bootBuildInfo
+> Task :processResources UP-TO-DATE
+> Task :processTestResources UP-TO-DATE
+> Task :generateEffectiveLombokConfig
+> Task :compileJava
+> Task :classes
+> Task :generateTestEffectiveLombokConfig
+> Task :compileTestJava
+Note: C:\Users\soares_diogo\DESENVOLVIMENTO\PROJETOS\spirecorrencia-api\src\test\java\io\sicredi\spirecorrencia\api\protocolo\SpiCanaisProtocoloApiConfigTest.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+> Task :testClasses
+May 27, 2025 10:49:45 AM org.junit.platform.launcher.core.LauncherConfigurationParameters loadClasspathResource
+WARNING: Discovered 2 'junit-platform.properties' configuration files in the classpath; only the first will be used.
+May 27, 2025 10:49:45 AM org.junit.platform.launcher.core.LauncherConfigurationParameters loadClasspathResource
+WARNING: Discovered 2 'junit-platform.properties' configuration files in the classpath; only the first will be used.
+WARNING: A Java agent has been loaded dynamically (C:\Users\soares_diogo\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.14.18\417558ea01fe9f0e8a94af28b9469d281c4e3984\byte-buddy-agent-1.14.18.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+class org.springframework.data.domain.Slice$MockitoMock$YhPBS4r9 cannot be cast to class org.springframework.data.domain.Page (org.springframework.data.domain.Slice$MockitoMock$YhPBS4r9 and org.springframework.data.domain.Page are in unnamed module of loader 'app')
+java.lang.ClassCastException: class org.springframework.data.domain.Slice$MockitoMock$YhPBS4r9 cannot be cast to class org.springframework.data.domain.Page (org.springframework.data.domain.Slice$MockitoMock$YhPBS4r9 and org.springframework.data.domain.Page are in unnamed module of loader 'app')
+	at io.sicredi.spirecorrencia.api.automatico.instrucaopagamentocancelamento.ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest.deveProcessarPaginasComConteudo(ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest.java:79)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+
+Java HotSpot(TM) 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :test
+ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest > deveProcessarPaginasComConteudo() FAILED
+    java.lang.ClassCastException: class org.springframework.data.domain.Slice$MockitoMock$YhPBS4r9 cannot be cast to class org.springframework.data.domain.Page (org.springframework.data.domain.Slice$MockitoMock$YhPBS4r9 and org.springframework.data.domain.Page are in unnamed module of loader 'app')
+        at io.sicredi.spirecorrencia.api.automatico.instrucaopagamentocancelamento.ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest.deveProcessarPaginasComConteudo(ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest.java:79)
+1 test completed, 1 failed
+> Task :test FAILED
+> Task :jacocoTestReport
+FAILURE: Build failed with an exception.
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///C:/Users/soares_diogo/DESENVOLVIMENTO/PROJETOS/spirecorrencia-api/build/reports/tests/test/index.html
+* Try:
+> Run with --scan to get full insights.
+BUILD FAILED in 44s
+9 actionable tasks: 7 executed, 2 up-to-date
+
+
