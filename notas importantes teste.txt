@@ -9,3 +9,33 @@ teste alterando
 teste alterando
 teste alterando
 teste alterando
+
+private RecorrenciaInstrucaoPagamentoCancelamentoRepository repository;
+    private ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImpl service;
+
+    @BeforeEach
+    void setUp() {
+        repository = mock(RecorrenciaInstrucaoPagamentoCancelamentoRepository.class);
+        service = spy(new ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImpl(null));
+
+        // Adapte caso precise injetar o repository diretamente via construtor
+        doReturn(repository).when(service).getRecorrenciaInstrucaoPagamentoCancelamentoRepository(); // suposição
+    }
+
+    @Test
+    void naoDeveExecutarAtualizacaoQuandoPaginaNaoTemConteudo() {
+        // Arrange
+        Slice<String> sliceSemConteudo = mock(Slice.class);
+        when(sliceSemConteudo.hasContent()).thenReturn(false);
+
+        when(repository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+                any(), any(), any(), any()))
+            .thenReturn(sliceSemConteudo);
+
+        // Act
+        service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+        // Assert
+        verify(service, never()).atualizarStatusCancelamento(anyList());
+    }
+}
