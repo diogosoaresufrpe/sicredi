@@ -86,4 +86,63 @@ class ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest {
 -----------------------------------------------------------------
 
 
+package io.sicredi.spirecorrencia.api.automatico.instrucaopagamentocancelamento;
 
+import br.com.sicredi.spicanais.transacional.transport.lib.commons.enums.TipoPessoaEnum;
+import io.sicredi.spirecorrencia.api.automatico.SolicitacaoAutorizacaoRecorrencia;
+import io.sicredi.spirecorrencia.api.automatico.SolicitacaoAutorizacaoRecorrenciaRepository;
+import io.sicredi.spirecorrencia.api.automatico.enums.TipoStatusSolicitacaoAutorizacao;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest {
+
+    @InjectMocks
+    private ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImpl service;
+
+    @Mock
+    private RecorrenciaInstrucaoPagamentoCancelamentoRepository repository;
+
+
+    @Test
+    void deveProcessarPaginasComConteudo() {
+        // Arrange
+        List<String> conteudoPagina1 = List.of("abc123", "def456");
+        List<String> conteudoPagina2 = List.of("ghi789");
+
+        Page<String> pagina1 = new PageImpl<>(conteudoPagina1, PageRequest.of(0, 10), 20);
+        Page<String> pagina2 = new PageImpl<>(conteudoPagina2, PageRequest.of(1, 10), 20);
+        Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(2, 10), 20);
+
+        when(repository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+                any(), any(), any(), any()))
+                .thenReturn(pagina1)
+                .thenReturn(pagina2)
+                .thenReturn(paginaVazia);
+
+        doNothing().when(service).atualizarStatusCancelamento(anyList());
+
+        // Act
+        service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+        // Assert
+        verify(service, times(2)).atualizarStatusCancelamento(anyList());
+    }
+
+}
