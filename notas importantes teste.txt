@@ -132,5 +132,36 @@ Execution failed for task ':test'.
 > Run with --scan to get full insights.
 BUILD FAILED in 44s
 9 actionable tasks: 7 executed, 2 up-to-date
+----------------------------------
 
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+
+...
+
+@Test
+void deveProcessarPaginasComConteudo() {
+    // Arrange
+    List<String> conteudoPagina1 = List.of("abc123", "def456");
+    List<String> conteudoPagina2 = List.of("ghi789");
+
+    Page<String> pagina1 = new PageImpl<>(conteudoPagina1, PageRequest.of(0, 10), 20);
+    Page<String> pagina2 = new PageImpl<>(conteudoPagina2, PageRequest.of(1, 10), 20);
+    Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(2, 10), 20);
+
+    when(repository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(), any(), any(), any()))
+        .thenReturn(pagina1)
+        .thenReturn(pagina2)
+        .thenReturn(paginaVazia);
+
+    doNothing().when(service).atualizarStatusCancelamento(anyList());
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    verify(service, times(2)).atualizarStatusCancelamento(anyList());
+}
 
