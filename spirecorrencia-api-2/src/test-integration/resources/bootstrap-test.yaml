@@ -1,0 +1,137 @@
+server:
+  port: 8089
+
+bootstrapServers: ${spring.embedded.kafka.brokers}
+dataSourceUrl: jdbc:h2:mem:db;MODE=Oracle;INIT=RUNSCRIPT FROM 'classpath:/db/schema.sql';DB_CLOSE_DELAY=-1
+dataSourceUser: sa
+dataSourcePassword: sa
+
+spring:
+  cloud:
+    consul.enabled: false
+    vault.enabled: false
+    openfeign:
+      httpclient:
+        enabled: true
+        max-connections: 200
+        max-connections-per-route: 50
+        time-to-live: -1
+        time-to-live-unit: MILLISECONDS
+      client:
+        config:
+          default:
+            connectTimeout: 2000
+            readTimeout: 2000
+            loggerLevel: FULL
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+  datasource:
+    driverClassName: org.h2.Driver
+  sql:
+    init:
+      mode: never
+  kafka:
+    properties:
+      security:
+        protocol: PLAINTEXT
+    producer:
+      client-id: groupIdTest
+    listener:
+      ack-mode: manual
+    consumer:
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
+      auto-offset-reset: earliest
+
+services:
+  gestent-conector:
+    url: http://localhost:8082
+    consulta-dados-agencia: /gestent/v2/entidade-sicredi
+  account-data:
+    url: http://localhost:8082
+  canaisdigitais-protocolo-info-internal-api:
+    url: http://localhost:8082
+    consulta-protocolo-por-tipo-e-identificador: /v3/{codigoTipoTransacao}/{identificadorTransacao}
+    auth:
+      client-id: teste-local
+      client-secret: teste-local
+  spirecorrencia-transport-lib:
+    listagem:
+      tamanho-maximo-pagina: 30
+  spi-extrato:
+    url: http://localhost:8086
+    ordens-extratos-detalhes: /v1/ordens/extratos/detalhes/{idFimAFim}
+  spicanais-protocolo-api:
+    url: http://localhost:8082
+    cadastro-recorrencia-integrada: /v1/recorrencias/cadastro
+    liquidacao-recorrencia: /v1/recorrencias/liquidacao
+    cancelamento-recorrencia: /v1/recorrencias/cancelamento
+    auth:
+      client-id: teste-local
+      client-secret: teste-local
+  spi-dict-consulta:
+    url: http://localhost:8082
+    consulta: /v2/chaves/{key}
+  spi-participantes:
+    url: http://localhost:8082
+    consulta: /v2/participantes/pagging
+
+config:
+  holdersMaintenance:
+    tamanhoDaConsulta: 1
+  jobNotificacaoDiaAnterior:
+    nome-job: "AgendadoRecorrenteNotificacaoDiaAnteriorJob"
+    tamanho-da-consulta: 100
+    job-habilitado: true
+    cron-expression: "0 0 8 * * *"
+    lockAtMostFor: "PT15M"
+    lockAtLeastFor: "PT5M"
+  jobProcessamentoLiquidacao:
+    nome-job: "AgendadoRecorrenteProcessamentoLiquidacaoJob"
+    tamanho-da-consulta: 100
+    job-habilitado: true
+    cron-expression: "0 0 6,18 * * *"
+    lockAtMostFor: "PT15M"
+    lockAtLeastFor: "PT5M"
+  jobNotificaoExpiracaoPixAutomatico:
+    nome-job: "AgendadoExpiracaoSolicitacaoPixAutomaticoJob"
+    tamanho-da-consulta: 100
+    job-habilitado: true
+    cron-expression: "0 1 1 * * *"
+    lockAtMostFor: "PT15M"
+    lockAtLeastFor: "PT5M"
+  jobConfirmacaoUsuarioPagadorAutorizacaoPixAutomatico:
+    nome-job: "ConfirmacaoUsuarioPagadorAutorizacaoPixAutomaticoJob"
+    tamanho-da-consulta: 100
+    job-habilitado: true
+    cron-expression: "0 0/2 * * * ?"
+    lockAtMostFor: "PT3M"
+    lockAtLeastFor: "PT5M"
+  regras:
+    processamento:
+      horario-limite-liquidacao: "23:59"
+      minutosExpiracao: 10
+      limiteExpiracaoHoras: 1
+      reenvioOperacaoHabilitado: true
+
+resilience4j:
+  ratelimiter:
+    instances:
+      processamentoLiquidacaoService:
+        limitForPeriod: 3
+        limitRefreshPeriod: 1s
+
+observability:
+  metrics.enabled: false
+  tracing.enabled: false
+  logs.enabled: false
+
+# NIVEL DE LOG Local
+logging.level:
+  root: WARN
+  org.springframework: WARN
+  io.sicredi: DEBUG
+  io.sicredi.engineering: WARN
+  io.sicredi.observability: WARN

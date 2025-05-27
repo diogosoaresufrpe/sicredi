@@ -1,0 +1,20 @@
+{
+  "content": [
+    {
+      "codigoIbge": "123456"
+    }
+  ],
+  "totalPages": 1,
+  "totalElements": 1,
+  "last": true,
+  "first": true,
+  "size": 10,
+  "number": 0,
+  "sort": {
+    "empty": true,
+    "unsorted": true,
+    "sorted": false
+  },
+  "numberOfElements": 1,
+  "empty": false
+}

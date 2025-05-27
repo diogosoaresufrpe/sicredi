@@ -1,0 +1,3 @@
+<configuration>
+    <include resource="io/sicredi/observability/logback/base-console.xml"/>
+</configuration>

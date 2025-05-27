@@ -1,0 +1,105 @@
+server:
+  port: 8088
+
+#DEV
+#k8sSuffix.host: .dev.sicredi.cloud
+#bootstrapServers: events-broker.dev.cloud.sicredi.net:9092
+#dataSourceUrl: jdbc:oracle:thin:@dtb1admindb049d.des.sicredi.net:1521/spipdb
+#dataSourceUser: spi_run
+#dataSourcePassword: pqid#176ha2
+#UAT
+k8sSuffix.host: .uat.sicredi.cloud
+bootstrapServers: events-broker.uat.cloud.sicredi.net:9092
+dataSourceUrl: jdbc:oracle:thin:@clgger19h-scan.hom.sicredi.net:1531/spipdb
+dataSourceUser: spi_owner
+dataSourcePassword: maicon#
+
+
+spring:
+  cloud:
+    consul.enabled: false
+    vault.enabled: false
+    openfeign:
+      httpclient:
+        enabled: true
+        max-connections: 200
+        max-connections-per-route: 50
+        time-to-live: -1
+        time-to-live-unit: MILLISECONDS
+      client:
+        config:
+          default:
+            connectTimeout: 1000
+            readTimeout: 1000
+            loggerLevel: FULL
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  kafka:
+    properties:
+      security:
+        protocol: PLAINTEXT
+    producer:
+      acks: all
+      retries: 5
+      retry.backoff.ms: 100
+      timeout: 5000
+      max.block.ms: 2000
+    consumer:
+      partition:
+        assignment:
+          strategy: org.apache.kafka.clients.consumer.CooperativeStickyAssignor
+
+services:
+  canaisdigitais-protocolo-info-internal-api:
+    auth:
+      client-id: d6ed1cf9-0c21-4d0b-9cf1-5667ab64d81a
+      client-secret: a0f7f6a5-e555-4b3f-8718-c20309705ef2
+  spirecorrencia-transport-lib:
+    listagem:
+      tamanho-maximo-pagina: 30
+  spicanais-protocolo-api:
+    auth:
+      client-id: jCMJwrzj-bMnW-wp4w-6mv4-l2mJLTU0vjpJ
+      client-secret: jb3SjDYP-rdCO-LUlG-FuJc-nsvNIScZ09gG
+
+config:
+  jobNotificacaoDiaAnterior:
+    job-habilitado: true
+    tamanho-da-consulta: 2
+    lockAtMostFor: "PT1S"
+    lockAtLeastFor: "PT1S"
+  jobProcessamentoLiquidacao:
+    job-habilitado: true
+    tamanho-da-consulta: 2
+    lockAtMostFor: "PT1S"
+    lockAtLeastFor: "PT1S"
+  jobNotificaoExpiracaoPixAutomatico:
+    job-habilitado: true
+    tamanho-da-consulta: 2
+    lockAtMostFor: "PT1S"
+    lockAtLeastFor: "PT1S"
+  jobConfirmacaoUsuarioPagadorAutorizacaoPixAutomatico:
+    tamanho-da-consulta: 2
+    job-habilitado: true
+    lockAtMostFor: "PT1S"
+    lockAtLeastFor: "PT1S"
+  jobConfirmacaoCancelamentoAposExpiracaoPixAutomatico:
+    nome-job: "ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob"
+    tamanho-da-consulta: 100
+    job-habilitado: true
+    cron-expression: "0 0/1 * * * ?"
+    lockAtMostFor: "PT1S"
+    lockAtLeastFor: "PT1S"
+observability:
+  metrics.enabled: false
+  tracing.enabled: false
+  logs.enabled: false
+
+# NIVEL DE LOG Local
+logging.level:
+  root: WARN
+  io.sicredi: DEBUG
+  io.sicredi.observability: WARN

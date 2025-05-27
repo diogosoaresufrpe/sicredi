@@ -1,0 +1,6 @@
+module:
+  mounts:
+    - source: README.md
+      target: content/<vertical>/<produto>/spirecorrencia-api/_index.md
+    - source: images
+      target: static/images

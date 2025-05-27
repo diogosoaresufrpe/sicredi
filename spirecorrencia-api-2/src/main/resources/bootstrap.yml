@@ -1,0 +1,360 @@
+spring:
+  main.banner-mode: "off"
+  application:
+    group: "spirecorrencia"
+    name: "spirecorrencia-api"
+  datasource:
+    url: ${dataSourceUrl}
+    username: ${dataSourceUser}
+    password: ${dataSourcePassword}
+    driverClassName: oracle.jdbc.OracleDriver
+  cloud:
+    consul:
+      ## Token - Provider CAS
+      token: ${CONSUL_TOKEN:bd5517a2-581c-bde9-0a66-8e1cdc86a482}
+      host: ${CONSUL_SERVER:http://consul.des.sicredi.net}
+      port: ${CONSUL_PORT:8500}
+      config:
+        ## Token - Provider AWS
+        acl-token: ${CONSUL_TOKEN:bd5517a2-581c-bde9-0a66-8e1cdc86a482}
+        enabled: true
+        ## Para Versionamento no Codigo
+        defaultContext: ${spring.application.name}
+        format: YAML
+        prefixes: ${spring.application.group}
+      discovery:
+        enabled: false
+    vault:
+      fail-fast: true
+      authentication: ${VAULT_AUTH:TOKEN}
+      ## Token do Vault para usar localmente
+      token: "5rSW5BJhjWOKvfecpCI4a9X8"
+      host: ${VAULT_SERVER:vault.des.sicredi.net}
+      port: 8200
+      scheme: ${VAULT_SCHEME:http}
+      kubernetes:
+        role: ${spring.application.name}
+        kubernetes-path: ${CLUSTER_NAME}
+      lookup:
+        - root-path: db
+          keys:
+            - oracle.spipdb.spi_run.password
+        - root-path: app/${spring.application.name}
+          keys:
+            - created_at
+            - kafka.token
+        - root-path: secret/app
+          keys:
+            - canaisdigitais-protocolo-info-internal-api.client-id
+            - canaisdigitais-protocolo-info-internal-api.client-secret
+            - spicanais-protocolo-api/token.client-id
+            - spicanais-protocolo-api/token.client-secret
+
+  kafka:
+    bootstrap-servers: ${bootstrapServers}
+    properties:
+      security:
+        protocol: SASL_PLAINTEXT
+      sasl:
+        mechanism: SCRAM-SHA-256
+        jaas:
+          config: org.apache.kafka.common.security.scram.ScramLoginModule required username="${spring.application.name}" password="${kafka.token}";
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 5
+      acks: all
+
+  sicredi:
+    validation:
+      binding_result:
+        code: SPIRECORRENCIA_REC0001
+        error: Requisição Inválida
+        message: Erro nos dados da requisição.
+      method_type_mismatch:
+        code: SPIRECORRENCIA_REC0002
+        error: Incompatibilidade de tipo de argumento para o método.
+      constraint_violation:
+        code: SPIRECORRENCIA_REC0003
+        error: Violação de restrição.
+      message_not_readable:
+        code: SPIRECORRENCIA_REC0004
+        error: Mensagem não legível.
+      header_missing:
+        code: SPIRECORRENCIA_REC0005
+        error: Cabeçalho (Header) não encontrado.
+      parameter_missing:
+        code: SPIRECORRENCIA_REC0006
+        error: Parâmetro não encontrado.
+      type_mismatch:
+        code: SPIRECORRENCIA_REC0007
+        error: Tipo de dado inválido.
+
+  jackson:
+    deserialization:
+      READ_UNKNOWN_ENUM_VALUES_AS_NULL: true
+    default-property-inclusion: non_null
+
+services:
+  gestent-conector:
+    url: https://gestent-conector-api${k8sSuffix.host}
+    consulta-dados-agencia: /gestent/v2/entidade-sicredi
+  account-data:
+    url: https://account-data-v1${k8sSuffix.host}
+  spirecorrencia-transport-lib:
+    listagem:
+      tamanho-maximo-pagina: 30
+  canaisdigitais-protocolo-info-internal-api:
+    url: https://canaisdigitais-protocolo-info-internal-api${k8sSuffix.host}
+    consulta-protocolo-por-tipo-e-identificador: /v3/{codigoTipoTransacao}/{identificadorTransacao}
+    auth:
+      client-id: ${canaisdigitais-protocolo-info-internal-api.client-id}
+      client-secret: ${canaisdigitais-protocolo-info-internal-api.client-secret}
+  spi-extrato:
+    url: https://spi-extrato${k8sSuffix.host}
+    ordens-extratos-detalhes: /v1/ordens/extratos/detalhes/{idFimAFim}
+  spicanais-protocolo-api:
+    url: https://spicanais-protocolo-api${k8sSuffix.host}
+    cadastro-recorrencia-integrada: /v1/recorrencias/cadastro
+    liquidacao-recorrencia: /v1/recorrencias/liquidacao
+    cancelamento-recorrencia: /v1/recorrencias/cancelamento
+    cadastro-autorizacao-integrada: /v1/automaticos/autorizacoes/cadastro
+    auth:
+      client-id: ${spicanais-protocolo-api/token.client-id}
+      client-secret: ${spicanais-protocolo-api/token.client-secret}
+  spi-dict-consulta:
+    url: https://spi-dict-consulta${k8sSuffix.host}
+    consulta: /v2/chaves/{key}
+  spi-participantes:
+    url: https://spi-participantes${k8sSuffix.host}
+    consulta: /v2/participantes/pagging
+
+idempotent:
+  transaction:
+    context:
+      enabled: true
+    cdc:
+      enabled: false
+    table:
+      sufix: _recorrencia
+      schema: spi_owner.
+    throw:
+      conflict: true
+
+config:
+  regras:
+    exclusao-horario-limite: "23:59:59"
+    horario:
+      inicio: "00:00:00"
+      fim: "19:59:59"
+      dia-minimo-cadastro-entre-inicio-fim: 1
+      dia-minimo-cadastro-fora-inicio-fim: 2
+    horario-open-finance:
+      inicio: "00:00:00"
+      fim: "23:59:59"
+      dia-minimo-cadastro-entre-inicio-fim: 1
+      dia-minimo-cadastro-fora-inicio-fim: 2
+    parcela:
+      numero-maximo-parcelas: 36
+    parcela-open-finance:
+      numero-maximo-parcelas: 60
+    processamento:
+      horario-limite-liquidacao: "18:00:00"
+      minutosExpiracao: 30
+      limiteExpiracaoHoras: 1
+      reenvioOperacaoHabilitado: true
+    cancelamento-agendamento:
+      horario-limite-cancelamento: "23:59:59"
+      dias-minimos-antecedencia: 1
+  holdersMaintenance:
+    tamanhoDaConsulta: 50
+  kafka:
+    consumer:
+      cadastro-recorrencia:
+        nome: agendado-recorrente-cadastro-protocolo-v1
+        group-id: ${spring.application.name}_cadastro-recorrencia
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+      cadastro-agendado:
+        nome: agendado-recorrente-transacional-cadastro-protocolo-v1
+        group-id: ${spring.application.name}_cadastro-agendado
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+      exclusao-recorrencia:
+        nome: agendado-recorrente-exclusao-protocolo-v1
+        group-id: ${spring.application.name}_exclusao-recorrencia
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+      holdersMaintenance:
+        nome: holders-maintenance-v1
+        group-id: ${spring.application.name}_holders-maintenance-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 10000
+      tratamento-erro-liquidacao-ordem-pagamento:
+        nome: spitransacional-ordem-erros-v1
+        group-id: ${spring.application.name}_retorno_ordem_pagamento_erros_consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+      retorno-transacao:
+        nome: spi-opag-recebimento-retorno-transacao-v1
+        group-id: ${spring.application.name}_retorno-transacao-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 3000
+          timeout: 60000
+      icom-pain-recebido:
+        nome: icom-pain-recebido-v1
+        group-id: ${spring.application.name}_icom-pain-recebido-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+      icom-pain-enviado:
+        nome: icom-pain-enviado-v1
+        group-id: ${spring.application.name}_icom-pain-enviado-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+      icom-pain-enviado-falha:
+        nome: icom-pain-enviado-falha-v1
+        group-id: ${spring.application.name}_icom-pain-enviado-falha-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+      confirmacao-solicitacao-autorizacao:
+        nome: automatico-recorrente-autorizacao-confirmacao-protocolo-v1
+        group-id: ${spring.application.name}_confirmacao-autorizacao-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay:
+          timeout: 60000
+      cadastro-autorizacao:
+        nome: automatico-recorrente-autorizacao-cadastro-protocolo-v1
+        group-id: ${spring.application.name}_cadastro-autorizacao-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+      cancelamento-debito:
+        nome: automatico-recorrente-instrucao-pagamento-cancelamento-protocolo-v1
+        group-id: ${spring.application.name}_cancelamento-debito-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+      icom-camt-recebido:
+        nome: icom-camt-recebido-v1
+        group-id: ${spring.application.name}_icom-camt-recebido-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay:
+          timeout: 60000
+      autorizacao-cancelamento:
+        nome: automatico-recorrente-autorizacao-cancelamento-protocolo-v1
+        group-id: ${spring.application.name}_autorizacao-cancelamento-consumer
+        concurrency: 1
+        retry:
+          tentativas: 3
+          delay: 200
+          timeout: 60000
+    producer:
+      exclusao-recorrencia:
+        topico: spirecorrencia-gestao-api-excluidos-v1
+      icom-pain-envio:
+        topico: icom-pain-envio-v1
+      comando-protocolo:
+        topico: canaisdigitais-protocolo-comando-v1
+      notificacao-recorrencia:
+        topico: spi-notificacao-recorrencia-v2
+      icom-camt-envio:
+        topico: icom-camt-envio-v1
+  observabilidade:
+    tracing:
+      decorator:
+        chaves-mdc:
+          habilitar: true
+        span-tags:
+          habilitar: true
+      kafka:
+        retry-topic:
+          habilitar: true
+  config-shedlock:
+    timezone: "America/Sao_Paulo"
+  jobNotificacaoDiaAnterior:
+    nome-job: "AgendadoRecorrenteNotificacaoDiaAnteriorJob"
+    tamanho-da-consulta: 100
+    job-habilitado: true
+    cron-expression: "0 0 8 * * *"
+    lockAtMostFor: "PT30M"
+    lockAtLeastFor: "PT15M"
+  jobProcessamentoLiquidacao:
+    nome-job: "AgendadoRecorrenteProcessamentoLiquidacaoJob"
+    tamanho-da-consulta: 100
+    job-habilitado: true
+    cron-expression: "0 0 7,19 * * *"
+    lockAtMostFor: "PT60M"
+    lockAtLeastFor: "PT50M"
+  jobNotificaoExpiracaoPixAutomatico:
+    nome-job: "AgendadoExpiracaoSolicitacaoPixAutomaticoJob"
+    tamanho-da-consulta: 100
+    job-habilitado: true
+    cron-expression: "0 1 1 * * *"
+    lockAtMostFor: "PT15M"
+    lockAtLeastFor: "PT5M"
+  jobConfirmacaoUsuarioPagadorAutorizacaoPixAutomatico:
+    nome-job: "ConfirmacaoUsuarioPagadorAutorizacaoPixAutomaticoJob"
+    tamanho-da-consulta: 100
+    job-habilitado: true
+    cron-expression: "0 0/15 * * * ?"
+    lockAtMostFor: "PT20M"
+    lockAtLeastFor: "PT10M"
+  jobConfirmacaoCancelamentoAposExpiracaoPixAutomatico:
+      nome-job: "ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob"
+      tamanho-da-consulta: 100
+      job-habilitado: true
+      cron-expression: "0 0/15 * * * ?"
+      lockAtMostFor: "PT20M"
+      lockAtLeastFor: "PT10M"
+
+resilience4j:
+  ratelimiter:
+    instances:
+      processamentoLiquidacaoService:
+        limitForPeriod: 13
+        limitRefreshPeriod: 1s
+
+# Não verificar no startup
+management.health:
+  consul.enabled: false
+  binders.enabled: false
+  vault.enabled: false
+  db.enabled: false
+
+# NIVEL DE LOG Padrão
+logging.level:
+  root: WARN
+  io.sicredi: INFO

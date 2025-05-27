@@ -1,0 +1,28 @@
+{
+  "operationId": "5f3894ab-31f8-406d-8ade-bc671517bd42",
+  "account": {
+    "company": "{{cooperativa}}",
+    "number": "{{conta}}"
+  },
+  "currentHolders": [
+    {
+      "suid": "{{cpfCnpjTitularAtual}}",
+      "name": "{{nomeTitularAtual}}",
+      "mainHolder": true
+    }
+  ],
+   "holdersToUpdate": [
+     {
+       "suid": "{{cpfCnpjTitularRemovido}}",
+       "customerId": "{{customerIdTitularRemovido}}",
+       "action": "REMOVE",
+       "finished": true
+     },
+     {
+       "suid": "{{cpfCnpjTitularAtual}}",
+       "customerId": "34866555-2b61-4eb4-8c75-492bf94f9852",
+       "action": "UPDATE",
+       "finished": true
+     }
+   ]
+}
