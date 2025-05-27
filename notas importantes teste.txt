@@ -464,4 +464,75 @@ void naoDeveChamarAtualizarStatusQuandoNaoHaConteudo() {
     // Assert
     verify(service, never()).atualizarStatusCancelamento(anyList());
 }
+--------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
 
+@Test
+void deveProcessarUmaPaginaComTamanhoExato() {
+    // Arrange
+    List<String> conteudo = IntStream.range(0, 1000)
+                                     .mapToObj(i -> "tx" + i)
+                                     .collect(Collectors.toList());
+    Page<String> pagina = new PageImpl<>(conteudo, PageRequest.of(0, 1000), 1000);
+    Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(1, 1000), 1000);
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(any(), any(), any(), any()))
+            .thenReturn(pagina)
+            .thenReturn(paginaVazia);
+
+    doNothing().when(service).atualizarStatusCancelamento(anyList());
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    verify(service, times(1)).atualizarStatusCancelamento(conteudo);
+}
+
+@Test
+void naoDeveProcessarQuandoSliceNaoTemConteudoNaPrimeiraPagina() {
+    // Arrange
+    Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(0, 1000), 0);
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(any(), any(), any(), any()))
+            .thenReturn(paginaVazia);
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    verify(service, never()).atualizarStatusCancelamento(anyList());
+}
+
+@Test
+void deveProcessarMultiplasPaginasParciais() {
+    // Arrange
+    Page<String> pagina1 = new PageImpl<>(List.of("tx1", "tx2"), PageRequest.of(0, 1000), 4);
+    Page<String> pagina2 = new PageImpl<>(List.of("tx3"), PageRequest.of(1, 1000), 4);
+    Page<String> pagina3 = new PageImpl<>(List.of("tx4"), PageRequest.of(2, 1000), 4);
+    Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(3, 1000), 4);
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(any(), any(), any(), any()))
+            .thenReturn(pagina1)
+            .thenReturn(pagina2)
+            .thenReturn(pagina3)
+            .thenReturn(paginaVazia);
+
+    doNothing().when(service).atualizarStatusCancelamento(anyList());
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    verify(service, times(3)).atualizarStatusCancelamento(anyList());
+}
+
+@Test
+void deveLancarExcecaoSeRepositorioFalhar() {
+    // Arrange
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(any(), any(), any(), any()))
+            .thenThrow(new RuntimeException("Erro no repositório"));
+
+    // Act & Assert
+    assertThrows(RuntimeException.class, () -> service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService());
+}
