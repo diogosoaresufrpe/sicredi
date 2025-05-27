@@ -536,3 +536,159 @@ void deveLancarExcecaoSeRepositorioFalhar() {
     // Act & Assert
     assertThrows(RuntimeException.class, () -> service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService());
 }
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+import br.com.seu.pacote.ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob;
+import br.com.seu.pacote.ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import static org.mockito.Mockito.*;
+
+class ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJobTest {
+
+    private ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoService service;
+    private ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob job;
+
+    @BeforeEach
+    void setUp() {
+        service = mock(ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoService.class);
+        job = new ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob(service);
+    }
+
+    @Test
+    void deveExecutarJobChamandoServico() {
+        // Quando
+        job.executar();
+
+        // Então
+        verify(service, times(1)).confirmarCancelamentoPixExpirado();
+    }
+}
+
+-----------------
+
+import br.com.seu.pacote.ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob;
+import br.com.seu.pacote.ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+
+import static org.mockito.Mockito.*;
+
+class ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJobTest {
+
+    private ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoService service;
+    private ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob job;
+
+    @BeforeEach
+    void setUp() {
+        service = mock(ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoService.class);
+        job = new ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob(service);
+    }
+
+    @Test
+    void deveExecutarJobChamandoServico() {
+        // Quando
+        job.executar();
+
+        // Então
+        verify(service, times(1)).confirmarCancelamentoPixExpirado();
+    }
+
+    @Test
+    void deveTratarExcecaoDaServiceSemLancar() {
+        // Dado
+        doThrow(new RuntimeException("Erro interno")).when(service).confirmarCancelamentoPixExpirado();
+
+        // Quando
+        try {
+            job.executar();
+        } catch (Exception e) {
+            // Então - não deve lançar exceção para fora
+            throw new AssertionError("Exceção não deveria ser propagada", e);
+        }
+
+        // E deve ter tentado executar o serviço
+        verify(service, times(1)).confirmarCancelamentoPixExpirado();
+    }
+
+    @Test
+    void naoDeveChamarServiceSeJobNaoForInicializadoCorretamente() {
+        // Simulação de um job inválido
+        ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob jobComServiceNull =
+            new ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob(null);
+
+        // Quando
+        try {
+            jobComServiceNull.executar();
+        } catch (NullPointerException ignored) {
+            // O ideal seria melhorar o design para evitar NPE
+        }
+
+        // Então: nada para verificar diretamente aqui
+        // Esse teste reforça a necessidade de validar a injeção de dependência
+    }
+}
+
++++++++++++++++++++++++++++++++++++++++++++=
+import br.com.seu.pacote.ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob;
+import br.com.seu.pacote.ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
+
+import static org.mockito.Mockito.*;
+
+class ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJobTest {
+
+    private ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoService service;
+    private ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob job;
+
+    @BeforeEach
+    void setUp() {
+        service = mock(ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoService.class);
+        job = new ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob(service);
+    }
+
+    @RepeatedTest(3)
+    void deveExecutarJobMultiplasVezes() {
+        job.executar();
+        verify(service, atLeastOnce()).confirmarCancelamentoPixExpirado();
+    }
+
+    @Test
+    void deveTratarIllegalStateException() {
+        doThrow(new IllegalStateException("Estado inválido")).when(service).confirmarCancelamentoPixExpirado();
+
+        try {
+            job.executar();
+        } catch (Exception e) {
+            throw new AssertionError("IllegalStateException não deveria ser propagada", e);
+        }
+
+        verify(service).confirmarCancelamentoPixExpirado();
+    }
+
+    @Test
+    void deveTratarExceptionGenericaSemPropagar() {
+        doThrow(new RuntimeException("Erro inesperado")).when(service).confirmarCancelamentoPixExpirado();
+
+        job.executar(); // Teste só passa se não lançar exceção
+
+        verify(service).confirmarCancelamentoPixExpirado();
+    }
+
+    @Test
+    void naoDeveExecutarNadaSeServiceForNulo() {
+        ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob jobNulo = new ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoJob(null);
+
+        try {
+            jobNulo.executar();
+        } catch (NullPointerException e) {
+            // Esperado neste caso
+        }
+    }
+}
