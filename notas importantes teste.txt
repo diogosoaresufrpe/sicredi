@@ -399,3 +399,69 @@ void deveUsarDataLimiteCorreta() {
     assertTrue(diferencaEmSegundos < 5);
 }
 
+
+-----------------------------------------------
+--------------------------------------------------
+
+@Test
+void deveContinuarProcessamentoMesmoComErroEmUmaPagina() {
+    // Arrange
+    List<String> pagina1 = List.of("transacao1", "transacao2");
+    List<String> pagina2 = List.of("transacao3");
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(any(), any(), any(), any()))
+            .thenReturn(new PageImpl<>(pagina1, PageRequest.of(0, 1000), 2))
+            .thenReturn(new PageImpl<>(pagina2, PageRequest.of(1, 1000), 2))
+            .thenReturn(new PageImpl<>(List.of(), PageRequest.of(2, 1000), 2));
+
+    // Primeira chamada lança exceção, segunda funciona
+    doThrow(new RuntimeException("Erro na página 1"))
+            .doNothing()
+            .when(service).atualizarStatusCancelamento(anyList());
+
+    // Act
+    assertThrows(RuntimeException.class, () -> service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService());
+
+    // Assert
+    verify(service, times(2)).atualizarStatusCancelamento(anyList());
+}
+
+
+@Test
+void deveChamarRepositorioComParametrosCorretos() {
+    // Arrange
+    Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(0, 1000), 0);
+
+    ArgumentCaptor<String> tipoCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<List<String>> statusCaptor = ArgumentCaptor.forClass(List.class);
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(), tipoCaptor.capture(), statusCaptor.capture(), any()))
+            .thenReturn(paginaVazia);
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    assertEquals("PAGADOR", tipoCaptor.getValue());
+    assertTrue(statusCaptor.getValue().contains("AUTORIZADO"));
+    assertTrue(statusCaptor.getValue().contains("NAO_AUTORIZADO"));
+}
+
+
+@Test
+void naoDeveChamarAtualizarStatusQuandoNaoHaConteudo() {
+    // Arrange
+    Page<String> paginaSemConteudo = new PageImpl<>(List.of(), PageRequest.of(0, 1000), 0);
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(), any(), any(), any()))
+            .thenReturn(paginaSemConteudo);
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    verify(service, never()).atualizarStatusCancelamento(anyList());
+}
+
