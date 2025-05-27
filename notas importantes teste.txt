@@ -165,3 +165,25 @@ void deveProcessarPaginasComConteudo() {
     verify(service, times(2)).atualizarStatusCancelamento(anyList());
 }
 
+---------------------------------------
+
+WARNING: A Java agent has been loaded dynamically (C:\Users\soares_diogo\.gradle\caches\modules-2\files-2.1\net.bytebuddy\byte-buddy-agent\1.14.18\417558ea01fe9f0e8a94af28b9469d281c4e3984\byte-buddy-agent-1.14.18.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+
+
+Argument passed to when() is null!
+Example of correct stubbing:
+    doThrow(new RuntimeException()).when(mock).someMethod();
+Also, if you use @Mock annotation don't miss openMocks()
+org.mockito.exceptions.misusing.NullInsteadOfMockException: 
+Argument passed to when() is null!
+Example of correct stubbing:
+    doThrow(new RuntimeException()).when(mock).someMethod();
+Also, if you use @Mock annotation don't miss openMocks()
+	at io.sicredi.spirecorrencia.api.automatico.instrucaopagamentocancelamento.ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest.deveProcessarPaginasComConteudo2(ConfirmacaoCancelamentoAposExpiracaoPixAutomaticoServiceImplTest.java:118)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
