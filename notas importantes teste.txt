@@ -267,3 +267,135 @@ void devePararQuandoPrimeiraPaginaNaoTemConteudo() {
             .getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(any(), any(), any(), any());
     verifyNoMoreInteractions(cancelamentoRepository);
 }
+
+----------------------------------------
+@Test
+void deveIgnorarErroQuandoRepositorioLancaExcecao() {
+    // Arrange
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(PageRequest.class),
+            eq("PAGADOR"),
+            anyList(),
+            any(LocalDateTime.class)
+    )).thenThrow(new RuntimeException("Erro no banco"));
+
+    // Act & Assert
+    assertDoesNotThrow(() -> service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService());
+}
+
+@Test
+void deveProcessarSomenteUmaPaginaComConteudo() {
+    // Arrange
+    Page<String> paginaUnica = new PageImpl<>(List.of("xpto123"), PageRequest.of(0, 1000), 1);
+    Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(1, 1000), 1);
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(PageRequest.class),
+            eq("PAGADOR"),
+            anyList(),
+            any(LocalDateTime.class)
+    )).thenReturn(paginaUnica).thenReturn(paginaVazia);
+
+    when(transactionTemplate.execute(any())).then(invocation -> {
+        var callback = invocation.getArgument(0);
+        return callback.doInTransaction(null);
+    });
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    verify(cancelamentoRepository, times(2))
+            .getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(any(), any(), any(), any());
+}
+
+@Captor
+ArgumentCaptor<PageRequest> pageRequestCaptor;
+
+@Test
+void devePassarParametrosCorretosAoRepositorio() {
+    // Arrange
+    MockitoAnnotations.openMocks(this); // inicializa @Captor
+    Page<String> page = new PageImpl<>(List.of("cod1"), PageRequest.of(0, 1000), 1);
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(PageRequest.class), eq("PAGADOR"), anyList(), any(LocalDateTime.class)
+    )).thenReturn(page).thenReturn(new PageImpl<>(List.of()));
+
+    when(transactionTemplate.execute(any())).then(invocation -> {
+        var callback = invocation.getArgument(0);
+        return callback.doInTransaction(null);
+    });
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    verify(cancelamentoRepository, atLeastOnce())
+            .getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+                    pageRequestCaptor.capture(), eq("PAGADOR"), anyList(), any());
+
+    PageRequest requisicao = pageRequestCaptor.getValue();
+    assertEquals(0, requisicao.getPageNumber());
+    assertEquals(1000, requisicao.getPageSize());
+}
+
+@Test
+void devePararIteracaoSePrimeiraPaginaNaoTemConteudo() {
+    // Arrange
+    Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(0, 1000), 0);
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(PageRequest.class), eq("PAGADOR"), anyList(), any(LocalDateTime.class)
+    )).thenReturn(paginaVazia);
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    verify(cancelamentoRepository, times(1)).getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(), any(), any(), any());
+    verifyNoInteractions(transactionTemplate);
+}
+
+@Test
+void deveLancarExcecaoAoFalharAtualizacaoStatus() {
+    // Arrange
+    List<String> codigos = List.of("cod1");
+    Page<String> paginaComErro = new PageImpl<>(codigos, PageRequest.of(0, 1000), 1);
+    Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(1, 1000), 1);
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(), any(), any(), any()
+    )).thenReturn(paginaComErro).thenReturn(paginaVazia);
+
+    doThrow(new RuntimeException("Erro ao atualizar"))
+            .when(service).atualizarStatusCancelamento(eq(codigos));
+
+    // Act & Assert
+    assertThrows(RuntimeException.class, () -> service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService());
+}
+
+@Test
+void deveUsarDataLimiteCorreta() {
+    // Arrange
+    Page<String> paginaVazia = new PageImpl<>(List.of(), PageRequest.of(0, 1000), 0);
+
+    ArgumentCaptor<LocalDateTime> dataLimiteCaptor = ArgumentCaptor.forClass(LocalDateTime.class);
+
+    when(cancelamentoRepository.getListaCodFimAFimByListStatusAndTipoPSPSolicitanteCancelamento(
+            any(), any(), any(), dataLimiteCaptor.capture()))
+            .thenReturn(paginaVazia);
+
+    // Act
+    service.atualizarConfirmacaoCancelamentoPixAutomaticoJobService();
+
+    // Assert
+    LocalDateTime dataLimiteUsada = dataLimiteCaptor.getValue();
+    LocalDateTime esperado = LocalDateTime.now().minusHours(12);
+
+    long diferencaEmSegundos = Math.abs(dataLimiteUsada.until(esperado, java.time.temporal.ChronoUnit.SECONDS));
+
+    // Tolerância de alguns segundos para execução do teste
+    assertTrue(diferencaEmSegundos < 5);
+}
+
