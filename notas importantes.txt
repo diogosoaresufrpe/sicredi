@@ -79,3 +79,6 @@ https://.postman.co/workspace/My-Workspace~208d4c6e-6c10-402d-8c56-df57e6678bfe/
 curl --location 'https://spirecorrencia-api.uat.sicredi.cloud/v1/automaticos/autorizacoes?status=CRIADA&status=APROVADA&status=REJEITADA&status=CANCELADA&status=EXPIRADA&tipoPessoaPagador=PJ&cpfCnpjPagador=73347283000116&agenciaPagador=0119&contaPagador=11794300&dataInicial=2025-08-15T14%3A39%3A43&dataFinal=2025-07-18T13%3A30%3A00&tamanhoPagina=50&numeroPagina=0' \
 --header 'accept: application/json' \
 --data ''
+
+AutorizacaoServiceImpl
+SolicitacaoAutorizacaoRecorrenciaServiceImpl
