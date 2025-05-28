@@ -70,3 +70,42 @@ https://gitlab.sicredi.net/spirecorrencia/spirecorrencia-api
 
 
 Caused by: org.hibernate.query.QueryArgumentException: Argument [EXCLUIDO] of type [java.lang.String] did not match parameter type [br.com.sicredi.spicanais.transacional.transport.lib.commons.enums.TipoStatusEnum (n/a)]
+
+
+https://.postman.co/workspace/My-Workspace~208d4c6e-6c10-402d-8c56-df57e6678bfe/request/38314474-e0a8c0ae-53ea-4602-acd4-3360184625d6?action=share&creator=38314474&ctx=documentation
+
+
+
+
+{
+  "identificadorTransacao": "E01181O215032O0519172504AEvQ7NdxH",
+  "identificacaoAssociado": {
+    "origemConta": "LEGADO",
+    "cooperativa": "0753",
+    "agencia": "15",
+    "conta": "182001",
+    "tipoConta": "CONTA_CORRENTE",
+    "cpfCnpjConta": "55307361815",
+    "cpfUsuario": "55307361815",
+    "nomeAssociadoConta": "Mauricio Benatti"
+  },
+  "idFimAFim": "E0218152120250519272514AEvQdaAxZ",
+  "participantePagador": {
+    "ispb": "01181521"
+  },
+  "nomeUsuarioPagador": "Mauricio Benatti",
+  "agenciaUsuarioRecebedor": "2216",
+  "contaUsuarioRecebedor": "53112",
+  "cpfCnpjUsuarioRecebedor": "25085107420",
+  "nomeUsuarioRecebedor": "PAULO",
+  "participanteRecebedor": {
+    "ispb": "01181521"
+  },
+  "tipoContaUsuarioRecebedor": "CONTA_CORRENTE",
+  "tipoPagamentoPix": "PIX_MANUAL",
+  "valor": 100,
+  "dataTransacao": "2025-05-08 14:25:04",
+  "tipoProduto": "AGENDADO_RECORRENTE",
+  "cpfCnpjAssociado": "55307361815",
+  "prioridadePagamento": "NORMAL"
+}
