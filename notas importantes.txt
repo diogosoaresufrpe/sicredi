@@ -82,3 +82,6 @@ curl --location 'https://spirecorrencia-api.uat.sicredi.cloud/v1/automaticos/aut
 
 AutorizacaoServiceImpl
 SolicitacaoAutorizacaoRecorrenciaServiceImpl
+
+
+io.sicredi.spirecorrencia.api.utils.SystemDateUtil.validarSeDataInicioMaiorDataFim(LocalDateTime, LocalDateTime): 1st parameter 'dataInicio' could be declared as java.time.chrono.ChronoLocalDateTime instead
