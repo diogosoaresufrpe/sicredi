@@ -85,3 +85,10 @@ SolicitacaoAutorizacaoRecorrenciaServiceImpl
 
 
 io.sicredi.spirecorrencia.api.utils.SystemDateUtil.validarSeDataInicioMaiorDataFim(LocalDateTime, LocalDateTime): 1st parameter 'dataInicio' could be declared as java.time.chrono.ChronoLocalDateTime instead
+
+public static void validarSeDataInicioMaiorDataFim(ChronoLocalDateTime<?> dataInicio, ChronoLocalDateTime<?> dataFim) {
+    if (dataInicio.isAfter(dataFim)) {
+        throw new IllegalArgumentException("Data de início não pode ser após a data de fim.");
+    }
+}
+
