@@ -7,7 +7,7 @@ https://github.com/diogosoaresufrpe/sicredi/blob/main/notas%20importantes.txt
 
 https://www.figma.com/board/jtGeYZH7eFDKTmas3G5igC/Mesa-3---Vol%C3%A1til?node-id=93-420&t=M8o8vAh7TgiWul63-4
 
-
+https://gitlab.sicredi.net/spirecorrencia/spirecorrencia-api
 
 primeira demanda 
 
@@ -92,3 +92,4 @@ public static void validarSeDataInicioMaiorDataFim(ChronoLocalDateTime<?> dataIn
     }
 }
 
+https://gitlab.sicredi.net/spirecorrencia/spirecorrencia-api/-/jobs/12495640
