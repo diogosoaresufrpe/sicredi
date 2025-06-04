@@ -97,3 +97,4 @@ https://gitlab.sicredi.net/spirecorrencia/spirecorrencia-api/-/jobs/12495640
 https://confederacaosicredi-my.sharepoint.com/:x:/r/personal/smartins_juliana_sicredi_com_br/Documents/Desktop/TasksList_01062025.xlsx?d=w58bf49499ff643a5803debcbb7063cfb&csf=1&web=1&e=f2it3H
 
 https://spirecorrencia-api.uat.sicredi.cloud
+https://teams.sicredi.io/browse/PC-1026
